@@ -45,3 +45,9 @@ Compile the code using any C++ compiler:
 Run the executable:
 
 
+OUTPUT::
+
+<img width="783" height="507" alt="contactappcpp" src="https://github.com/user-attachments/assets/489f9926-1b7c-48fc-a10f-0514e1fd77d0" />
+
+
+
