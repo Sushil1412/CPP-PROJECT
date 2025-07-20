@@ -36,19 +36,12 @@ Menu-driven program
 💻 How to Run
 Clone this repository or download the .cpp file:
 
-bash
-Copy
-Edit
-git clone https://github.com/your-username/contact-book-cpp.git
+
+1. git clone https://github.com/your-username/contact-book-cpp.git
 Compile the code using any C++ compiler:
 
-bash
-Copy
-Edit
-g++ contact_book.cpp -o contact_book
+
+2. g++ contact_book.cpp -o contact_book
 Run the executable:
 
-bash
-Copy
-Edit
-./contact_book
+
