@@ -1,7 +1,7 @@
-📘 Contact Book – C++ Project
+<h2>📘 Contact Book – C++ Project</h2>
 A simple Contact Book application written in C++ using Object-Oriented Programming (OOP) principles and file handling. Users can add, edit, delete, search, display, and persist contacts across sessions using a text file.
 
-🚀 Features
+<h2>🚀 Features</h2>
 <h2>Add a new contact with name and phone number</h2>
 
 Edit existing contact details
@@ -33,7 +33,7 @@ String Manipulation
 
 Menu-driven program
 
-💻 How to Run
+<h2>💻 How to Run</h2>
 Clone this repository or download the .cpp file:
 
 
@@ -45,7 +45,7 @@ Compile the code using any C++ compiler:
 Run the executable:
 
 
-OUTPUT::
+<h2>OUTPUT::</h2>
 
 <img width="783" height="507" alt="contactappcpp" src="https://github.com/user-attachments/assets/489f9926-1b7c-48fc-a10f-0514e1fd77d0" />
 
