@@ -1,167 +1,214 @@
-
-
-    // This code represents a basic contact book application implemented in C++.
-// It includes classes for Person, Contact, and ContactBook.
-// - Person class represents a basic entity with a name.
-// - Contact class, inheriting from Person, adds phone number functionality.
-// - ContactBook class manages a collection of contacts and provides operations like adding, displaying,
-//   editing, deleting, and searching contacts.
-// The main function serves as the entry point to interact with the ContactBook functionalities.
-
-
-
-
-
-
 #include <iostream>
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
-class Person {
-public:
-    string name;
-
-
-    Person(string name) : name(name) {}
-
-    string getName() {
-        return name;
-    }
-    virtual void displayDetails() = 0;//virtual function
-};
-
-class Contact : public Person {
+class Contact
+{
 private:
+    string name;
     string phoneNumber;
 
 public:
-    Contact(string name, string phoneNumber) : Person(name), phoneNumber(phoneNumber) {}
+    Contact(string name = "", string phoneNumber = "")
+    {
+        this->name = name;
+        this->phoneNumber = phoneNumber;
+    }
 
-    string getPhoneNumber() {
+    string getName() const
+    {
+        return name;
+    }
+
+    string getPhoneNumber() const
+    {
         return phoneNumber;
     }
 
-    void setPhoneNumber(string newPhoneNumber) {
+    void setName(string newName)
+    {
+        name = newName;
+    }
+
+    void setPhoneNumber(string newPhoneNumber)
+    {
         phoneNumber = newPhoneNumber;
     }
-    // overriding function
-     void displayDetails() {
-        cout << "Name: " << getName() << ", Phone Number: " << getPhoneNumber() << endl;
-    }
-    
-       
-};//end of contact
 
-class ContactBook {
+    string serialize() const
+    {
+        return name + "," + phoneNumber;
+    }
+
+    static Contact deserialize(const string &line)
+    {
+        size_t comma = line.find(',');
+        string name = line.substr(0, comma);
+        string phone = line.substr(comma + 1);
+        return Contact(name, phone);
+    }
+};
+
+class ContactBook
+{
 private:
     vector<Contact> contacts;
+    const string filename = "contacts.txt";
+
+    static string toLower(const string &str)
+    {
+        string lower = str;
+        transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+        return lower;
+    }
 
 public:
-//adding contacts
-   inline void addContact(string name, string phoneNumber) {
-        Contact newContact(name, phoneNumber);
-        contacts.push_back(newContact);
-        cout << "Contact added successfully." << endl;
+    ContactBook()
+    {
+        loadFromFile();
     }
-// searching contacts
-  inline  bool search( string& name) {
-        for (int i = 0; i < contacts.size(); ++i) {
-            if (contacts[i].getName() == name) {
+
+    void loadFromFile()
+    {
+        ifstream inFile(filename);
+        string line;
+        while (getline(inFile, line))
+        {
+            if (!line.empty())
+            {
+                contacts.push_back(Contact::deserialize(line));
+            }
+        }
+        inFile.close();
+    }
+
+    void saveToFile()
+    {
+        ofstream outFile(filename, ios::trunc);
+        for (const auto &contact : contacts)
+        {
+            outFile << contact.serialize() << endl;
+        }
+        outFile.close();
+    }
+
+    bool contactExists(const string &name)
+    {
+        string lowerName = toLower(name);
+        for (const auto &contact : contacts)
+        {
+            if (toLower(contact.getName()) == lowerName)
+            {
                 return true;
             }
         }
         return false;
     }
-//Edit contacts
-    void editContact(string oldName, string newName, string newPhoneNumber) {
-        bool found = false;
-        for (int i = 0; i < contacts.size(); ++i) {
-            if (contacts[i].getName() == oldName) {
-                contacts[i].name = newName;
-                contacts[i].setPhoneNumber(newPhoneNumber);
-                cout << "Contact details updated successfully." << endl;
-                found = true;
-                break;
-            }
-        }
 
-        if (!found) {
-            cout << "Contact not found." << endl;
+    void addContact(const string &name, const string &phoneNumber)
+    {
+        if (contactExists(name))
+        {
+            cout << "Contact already exists with this name.\n";
+            return;
         }
-    }
-//Delete contacts
-    void deleteContact(const string& name) {
-        bool found = false;
-        for (int i = 0; i < contacts.size(); ++i) {
-            if (contacts[i].getName() == name) {
-                contacts.erase(contacts.begin() + i);
-                cout << "Contact deleted successfully." << endl;
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            cout << "Contact not found." << endl;
-        }
+        contacts.push_back(Contact(name, phoneNumber));
+        saveToFile();
+        cout << "Contact added successfully.\n";
     }
 
-     void searchContact( string& name) {
-        bool found = false;
-        for (int i = 0; i < contacts.size(); ++i) {
-            if (contacts[i].getName() == name) {
-                cout << "Contact found:" << endl;
-                cout << "Name: " << contacts[i].getName() << ", Phone Number: " << contacts[i].getPhoneNumber() << endl;
-                found = true;
-                break;
+    void editContact(const string &oldName, const string &newName, const string &newPhoneNumber)
+    {
+        for (auto &contact : contacts)
+        {
+            if (toLower(contact.getName()) == toLower(oldName))
+            {
+                contact.setName(newName);
+                contact.setPhoneNumber(newPhoneNumber);
+                saveToFile();
+                cout << "Contact details updated successfully.\n";
+                return;
             }
         }
+        cout << "Contact not found.\n";
+    }
 
-        if (!found) {
-            cout << "Contact not found." << endl;
+    void deleteContact(const string &name)
+    {
+        for (auto it = contacts.begin(); it != contacts.end(); ++it)
+        {
+            if (toLower(it->getName()) == toLower(name))
+            {
+                contacts.erase(it);
+                saveToFile();
+                cout << "Contact deleted successfully.\n";
+                return;
+            }
         }
-     } 
+        cout << "Contact not found.\n";
+    }
 
-     void displayContacts() {
-        if (contacts.empty()) {
-            cout << "Contact book is empty." << endl;
-        } else {
-            cout << "Contacts:" << endl;
-            for (int i = 0; i < contacts.size(); ++i) {
-               contacts[i].displayDetails();
+    void searchContact(const string &name)
+    {
+        bool found = false;
+        for (const auto &contact : contacts)
+        {
+            if (toLower(contact.getName()).find(toLower(name)) != string::npos)
+            {
+                cout << "Name: " << contact.getName()
+                     << ", Phone: " << contact.getPhoneNumber() << endl;
+                found = true;
+            }
+        }
+        if (!found)
+        {
+            cout << "No matching contact found.\n";
+        }
+    }
+
+    void displayContacts() const
+    {
+        if (contacts.empty())
+        {
+            cout << "Contact book is empty.\n";
+        }
+        else
+        {
+            cout << "\nAll Contacts:\n";
+            for (const auto &contact : contacts)
+            {
+                cout << "Name: " << contact.getName()
+                     << ", Phone Number: " << contact.getPhoneNumber() << endl;
             }
         }
     }
 
-   
-        friend void deleteAllContacts(ContactBook& book);//freind function
-};//end of contactBook
+    void deleteAllContacts()
+    {
+        contacts.clear();
+        saveToFile();
+        cout << "All contacts deleted successfully.\n";
+    }
+};
 
-//friend  function definition
-
-void deleteAllContacts(ContactBook& book) {
-    book.contacts.clear();
-    cout << "All contacts deleted successfully." << endl;
+bool isValidPhoneNumber(const string &phone)
+{
+    return phone.length() == 10 && all_of(phone.begin(), phone.end(), ::isdigit);
 }
-  
-    
 
-  
-
-
-
-
-int main() {
-    ContactBook myContactBook;
-
+int main()
+{
+    ContactBook contactBook;
     int choice;
-    string name, phoneNumber, oldName, newName, newPhoneNumber;
+    string name, phone, oldName, newName, newPhone;
 
-    do {
-        cout << "\nContact Book Menu:\n";
+    do
+    {
+        cout << "\n Contact Book Menu \n";
         cout << "1. Add Contact\n";
         cout << "2. Edit Contact\n";
         cout << "3. Delete Contact\n";
@@ -169,51 +216,71 @@ int main() {
         cout << "5. Display All Contacts\n";
         cout << "6. Delete All Contacts\n";
         cout << "7. Exit\n";
-        cout << "Enter your choice: ";
+        cout << "Enter your choice (1 - 7): ";
         cin >> choice;
+        cin.ignore(); // clear input buffer
 
-        switch (choice) {
-            case 1:
-                cout << "Enter name: ";
-                cin >> name;
-                cout << "Enter phone number: ";
-                cin >> phoneNumber;
-                myContactBook.addContact(name, phoneNumber);
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter name: ";
+            getline(cin, name);
+            cout << "Enter phone number (10 digits): ";
+            getline(cin, phone);
+            if (!isValidPhoneNumber(phone))
+            {
+                cout << "❌ Invalid phone number format.\n";
                 break;
-            case 2:
-                cout << "Enter the name of the contact you want to edit: ";
-                cin >> oldName;
-                if (myContactBook.search(oldName)) {
-                    cout << "Enter new name: ";
-                    cin >> newName;
-                    cout << "Enter new phone number: ";
-                    cin >> newPhoneNumber;
-                    myContactBook.editContact(oldName, newName, newPhoneNumber);
-                } else {
-                    cout << "Contact not found";
-                }
+            }
+            contactBook.addContact(name, phone);
+            break;
+
+        case 2:
+            cout << "Enter existing contact name to edit: ";
+            getline(cin, oldName);
+            if (!contactBook.contactExists(oldName))
+            {
+                cout << "❌ Contact not found.\n";
                 break;
-            case 3:
-                cout << "Enter the name of the contact you want to delete: ";
-                cin >> name;
-                myContactBook.deleteContact(name);
+            }
+            cout << "Enter new name: ";
+            getline(cin, newName);
+            cout << "Enter new phone number: ";
+            getline(cin, newPhone);
+            if (!isValidPhoneNumber(newPhone))
+            {
+                cout << "❌ Invalid phone number format.\n";
                 break;
-            case 4:
-                cout << "Enter the name of the contact you want to search for: ";
-                cin >> name;
-                myContactBook.searchContact(name);
-                break;
-            case 5:
-                myContactBook.displayContacts();
-                break;
-            case 6:
-                deleteAllContacts(myContactBook);
-                break;
-            case 7:
-                cout << "Exiting...\n";
-                break;
-            default:
-                cout << "Invalid choice. Please enter a valid option.\n";
+            }
+            contactBook.editContact(oldName, newName, newPhone);
+            break;
+
+        case 3:
+            cout << "Enter name of contact to delete: ";
+            getline(cin, name);
+            contactBook.deleteContact(name);
+            break;
+
+        case 4:
+            cout << "Enter name or part of name to search: ";
+            getline(cin, name);
+            contactBook.searchContact(name);
+            break;
+
+        case 5:
+            contactBook.displayContacts();
+            break;
+
+        case 6:
+            contactBook.deleteAllContacts();
+            break;
+
+        case 7:
+            cout << "Exiting Contact Book. Goodbye! 👋\n";
+            break;
+
+        default:
+            cout << "❌ Invalid choice. Try again.\n";
         }
     } while (choice != 7);
 
