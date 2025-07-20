@@ -2,7 +2,7 @@
 A simple Contact Book application written in C++ using Object-Oriented Programming (OOP) principles and file handling. Users can add, edit, delete, search, display, and persist contacts across sessions using a text file.
 
 🚀 Features
-Add a new contact with name and phone number
+<h2>Add a new contact with name and phone number</h2>
 
 Edit existing contact details
 
@@ -20,7 +20,7 @@ Duplicate name prevention
 
 Console-based menu UI
 
-🧠 Concepts Used
+<h2>🧠 Concepts Used </h2>
 C++ Classes & Objects
 
 Encapsulation
