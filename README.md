@@ -37,7 +37,7 @@ Menu-driven program
 Clone this repository or download the .cpp file:
 
 
-1. git clone https://github.com/your-username/contact-book-cpp.git
+1. git clone https://github.com/Sushil1412/contact-book-cpp.git
 Compile the code using any C++ compiler:
 
 
